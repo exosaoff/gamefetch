@@ -1,0 +1,76 @@
+-- Function to gather all relevant game data
+local function gatherAllGameData()
+    local data = {} -- Table to store information
+    
+    -- 1. Tools (e.g., weapons, items players can hold)
+    local function fetchTools()
+        local toolsFound = {}
+        for _, tool in ipairs(game:GetDescendants()) do
+            if tool:IsA("Tool") then
+                table.insert(toolsFound, "Tool: " .. tool.Name .. " | Location: " .. tool.Parent.Name)
+            end
+        end
+        return toolsFound
+    end
+
+    -- 2. Accessories (e.g., hats, wearable items)
+    local function fetchAccessories()
+        local accessoriesFound = {}
+        for _, accessory in ipairs(game:GetDescendants()) do
+            if accessory:IsA("Accessory") then
+                table.insert(accessoriesFound, "Accessory: " .. accessory.Name .. " | Owner: " .. (accessory.Parent.Name or "Unknown"))
+            end
+        end
+        return accessoriesFound
+    end
+
+    -- 3. Humanoids (Players/NPCs and their properties)
+    local function fetchHumanoids()
+        local humanoidsFound = {}
+        for _, obj in ipairs(game.Workspace:GetDescendants()) do
+            if obj:IsA("Humanoid") then
+                local humanoidInfo = "Humanoid: " .. obj.Parent.Name
+                humanoidInfo = humanoidInfo .. " | Health: " .. obj.Health .. " / " .. obj.MaxHealth
+                if obj.Parent:FindFirstChild("HumanoidRootPart") then
+                    humanoidInfo = humanoidInfo .. " | Position: " .. tostring(obj.Parent.HumanoidRootPart.Position)
+                end
+                table.insert(humanoidsFound, humanoidInfo)
+            end
+        end
+        return humanoidsFound
+    end
+
+    -- 4. BaseParts (Physical objects in the game)
+    local function fetchBaseParts()
+        local partsFound = {}
+        for _, part in ipairs(game.Workspace:GetDescendants()) do
+            if part:IsA("BasePart") then
+                table.insert(partsFound, "Part: " .. part.Name .. " | Position: " .. tostring(part.Position))
+            end
+        end
+        return partsFound
+    end
+
+    -- Fetch all data
+    data["Tools"] = fetchTools()
+    data["Accessories"] = fetchAccessories()
+    data["Humanoids"] = fetchHumanoids()
+    data["BaseParts"] = fetchBaseParts()
+
+    -- Combine all information into a single string
+    local fullData = {}
+    for category, items in pairs(data) do
+        table.insert(fullData, "Category: " .. category)
+        for _, item in ipairs(items) do
+            table.insert(fullData, " - " .. item)
+        end
+    end
+    local finalString = table.concat(fullData, "\n")
+
+    -- Copy to clipboard (Executor-dependent)
+    setclipboard(finalString)
+    print("Game information copied to clipboard!")
+end
+
+-- Execute the function
+gatherAllGameData()
